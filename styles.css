@@ -1,0 +1,51 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(180deg, #083AC3 28%, #041C5D 62%);
+  }
+  
+  .page {
+    width: 400px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .entry-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .entry-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .entry-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .estimate-button {
+    padding: 10px;
+    font-size: 18px;
+    background: #083AC3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .estimate-button:hover {
+    background: #041C5D;
+  }
+  
