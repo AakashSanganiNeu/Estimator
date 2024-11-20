@@ -3,27 +3,248 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estimate Calculator</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>EDD Calculator</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(180deg, #083AC3 28%, #041C5D 62%);
+      color: #ffffff;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+
+    .form-container {
+      margin: auto;
+      width: 90%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      color: #333333;
+    }
+
+    fieldset {
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    legend {
+      font-size: 18px;
+      color: #083AC3;
+      font-weight: bold;
+      text-align: left;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    input, select {
+      margin-top: 5px;
+      padding: 10px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button[type="button"] {
+      background-color: #083AC3;
+      color: #ffffff;
+    }
+
+    button[type="button"]:hover {
+      background-color: #041C5D;
+    }
+
+    button[type="reset"] {
+      background-color: #f44336;
+      color: #ffffff;
+    }
+
+    button[type="reset"]:hover {
+      background-color: #c62828;
+    }
+
+    #results {
+      margin-top: 20px;
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      color: #083AC3;
+      display: none;
+    }
+
+    #results label {
+      color: #041C5D;
+      font-weight: bold;
+    }
+
+    .switch-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .switch-container button {
+      width: 48%;
+      margin: 0 1%;
+      background: #f88e036d;
+    }
+
+    .switch-container button.active {
+      background: #f88e03;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <div class="page">
-    <div class="entry-section">
-      <div class="entry-box">
-        <label for="num1">Enter Number 1:</label>
-        <input id="num1" type="number" class="entry-input" />
-      </div>
-      <div class="entry-box">
-        <label for="num2">Enter Number 2:</label>
-        <input id="num2" type="number" class="entry-input" />
-      </div>
-      <div class="entry-box">
-        <label for="date">Enter a Date:</label>
-        <input id="date" type="date" class="entry-input" />
-      </div>
-      <button id="estimate-button" class="estimate-button">Estimate</button>
-    </div>
+  <h1>EDD Calculator</h1>
+
+  <div class="switch-container">
+    <button id="lastPeriodBtn" class="active" onclick="showForm('lastPeriodForm')">Last Period</button>
+    <button id="scannedDateBtn" onclick="showForm('scannedDateForm')">Scanned Date + GA</button>
   </div>
-  <script src="script.js"></script>
+
+  <!-- Last Period Form -->
+  <div id="lastPeriodForm" class="form-container">
+    <form id="eddForm">
+      <fieldset>
+        <legend>Calculate by Last Period</legend>
+        
+        <label for="today">Today's Date:</label>
+        <input type="date" id="today" required>
+        
+        <label for="lastPeriod">First Day of Last Period:</label>
+        <input type="date" id="lastPeriod" required>
+      </fieldset>
+
+      <fieldset id="results-last" style="display: none;">
+        <legend>Results</legend>
+        
+        <label>Estimated Due Date:</label>
+        <input type="text" id="dueDate" readonly>
+        
+        <label>Gestational Age:</label>
+        <input type="text" id="gestationalAge" readonly>
+      </fieldset>
+
+      <button type="button" onclick="calculateEDD()">Calculate</button>
+      <button type="reset" onclick="resetForm()">Reset Form</button>
+    </form>
+  </div>
+
+  <!-- Scanned Date + GA Form -->
+<div id="scannedDateForm" class="form-container" style="display: none;">
+  <form id="eddFromGAForm">
+    <fieldset>
+      <legend>Calculate by Scanned Date + GA</legend>
+      
+      <label for="scannedDate">Scanned Date:</label>
+      <input type="date" id="scannedDate" required>
+      
+      <label for="gestationalAgeWeeks">Gestational Age (in weeks):</label>
+      <input type="number" id="gestationalAgeWeeks" placeholder="e.g., 16" min="0" required>
+      
+      <label for="gestationalAgeDays">Gestational Age (in days):</label>
+      <input type="number" id="gestationalAgeDays" placeholder="e.g., 4" min="0" max="6" required>
+    </fieldset>
+
+    <fieldset id="results-ga" style="display: none;">
+      <legend>Results</legend>
+      
+      <label>Estimated Due Date (EDD):</label>
+      <input type="text" id="edd" readonly>
+    </fieldset>
+
+    <button type="button" onclick="calculateEDDFromGA()">Calculate</button>
+    <button type="reset" onclick="resetForm()">Reset Form</button>
+  </form>
+</div>
+
+  <script>
+    function showForm(formId) {
+      document.getElementById('lastPeriodForm').style.display = formId === 'lastPeriodForm' ? 'block' : 'none';
+      document.getElementById('scannedDateForm').style.display = formId === 'scannedDateForm' ? 'block' : 'none';
+
+      document.getElementById('lastPeriodBtn').classList.toggle('active', formId === 'lastPeriodForm');
+      document.getElementById('scannedDateBtn').classList.toggle('active', formId === 'scannedDateForm');
+    }
+
+    function calculateEDD() {
+      const today = new Date(document.getElementById("today").value);
+      const lastPeriod = new Date(document.getElementById("lastPeriod").value);
+
+      if (!today || !lastPeriod) {
+        alert("Please provide valid dates!");
+        return;
+      }
+
+      const dueDate = new Date(lastPeriod);
+      dueDate.setDate(dueDate.getDate() + 280);
+
+      const gestationalAgeDays = Math.floor((today - lastPeriod) / (1000 * 60 * 60 * 24));
+      const weeks = Math.floor(gestationalAgeDays / 7);
+      const days = gestationalAgeDays % 7;
+
+      document.getElementById("dueDate").value = dueDate.toDateString();
+      document.getElementById("gestationalAge").value = `${weeks} weeks ${days} day${days > 1 ? "s" : ""}`;
+      document.getElementById("results-last").style.display = "block";
+    }
+
+  function calculateEDDFromGA() {
+    const scannedDate = new Date(document.getElementById("scannedDate").value);
+    const gestationalAgeWeeks = parseInt(document.getElementById("gestationalAgeWeeks").value, 10);
+    const gestationalAgeDays = parseInt(document.getElementById("gestationalAgeDays").value, 10) || 0;
+
+    if (!scannedDate || isNaN(gestationalAgeWeeks) || isNaN(gestationalAgeDays) || gestationalAgeWeeks < 0 || gestationalAgeDays < 0 || gestationalAgeDays > 6) {
+      alert("Please provide valid inputs for weeks and days!");
+      return;
+    }
+
+    const totalGestationalAgeDays = gestationalAgeWeeks * 7 + gestationalAgeDays;
+
+    // Calculate pregnancy start date
+    const pregnancyStartDate = new Date(scannedDate);
+    pregnancyStartDate.setDate(pregnancyStartDate.getDate() - totalGestationalAgeDays);
+
+    // Calculate EDD
+    const edd = new Date(pregnancyStartDate);
+    edd.setDate(edd.getDate() + 280);
+
+    document.getElementById("edd").value = edd.toDateString();
+    document.getElementById("results-ga").style.display = "block";
+  }
+    function resetForm() {
+      document.querySelectorAll("#results, #results-last, #results-ga").forEach(el => el.style.display = "none");
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+    const todayField = document.getElementById("today");
+    const today = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+    todayField.value = today;
+  });
+  </script>
 </body>
 </html>
