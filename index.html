@@ -174,10 +174,14 @@
 
     <fieldset id="results-ga" style="display: none;">
       <legend>Results</legend>
-      
+    
       <label>Estimated Due Date (EDD):</label>
       <input type="text" id="edd" readonly>
+      
+      <label>Gestational Age Today:</label>
+      <input type="text" id="gaToday" readonly>
     </fieldset>
+    
 
     <button type="button" onclick="calculateEDDFromGA()">Calculate</button>
     <button type="reset" onclick="resetForm()">Reset Form</button>
@@ -234,9 +238,18 @@
     const edd = new Date(pregnancyStartDate);
     edd.setDate(edd.getDate() + 280);
 
+    // Calculate GA as of today
+    const today = new Date();
+    const gestationalAgeTodayDays = Math.floor((today - pregnancyStartDate) / (1000 * 60 * 60 * 24));
+    const weeksToday = Math.floor(gestationalAgeTodayDays / 7);
+    const daysToday = gestationalAgeTodayDays % 7;
+
+    // Display results
     document.getElementById("edd").value = edd.toDateString();
+    document.getElementById("gaToday").value = `${weeksToday} weeks ${daysToday} day${daysToday > 1 ? "s" : ""}`;
     document.getElementById("results-ga").style.display = "block";
   }
+
     function resetForm() {
       document.querySelectorAll("#results, #results-last, #results-ga").forEach(el => el.style.display = "none");
     }
